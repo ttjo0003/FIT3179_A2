@@ -1,0 +1,69 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v6.json",
+  "width": 700,
+  "height": 400,
+  "background": "#f9f9f9",
+
+  "data": {
+    "url": "https://raw.githubusercontent.com/ttjo0003/FIT3179_w9_hw/refs/heads/main/global_inflation_long_new.csv"
+  },
+
+  "params": [
+    {
+      "name": "CountrySelect",
+      "value": "Malaysia",
+      "bind": {
+        "input": "select",
+        "options": [
+          "Malaysia",
+          "Singapore",
+          "Indonesia",
+          "Thailand",
+          "United States",
+          "China",
+          "Japan",
+          "India",
+          "United Kingdom",
+          "Germany"
+        ],
+        "name": "Select Country: "
+      }
+    }
+  ],
+
+  "transform": [
+    {"filter": "datum.country_name == CountrySelect"}
+  ],
+
+  "mark": {
+    "type": "line",
+    "point": true,
+    "strokeWidth": 2,
+    "color": "#e34a33"
+  },
+
+  "encoding": {
+    "x": {
+      "field": "year",
+      "type": "temporal",
+      "title": "Year",
+      "axis": {"format": "%Y", "labelAngle": 0}
+    },
+    "y": {
+      "field": "inflation",
+      "type": "quantitative",
+      "title": "Inflation Rate (%)"
+    },
+    "tooltip": [
+      {"field": "year", "title": "Year"},
+      {"field": "inflation", "title": "Inflation (%)"}
+    ]
+  },
+
+  "title": {
+    "text": "Inflation Rate Over Time",
+    "fontSize": 18,
+    "anchor": "start",
+    "color": "#333"
+  }
+}

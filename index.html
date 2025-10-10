@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Global Inflation Trends</title>
+
+  <!-- Vega & Vega-Lite -->
+  <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+
+  <style>
+    body {
+      font-family: "Inter", "Segoe UI", sans-serif;
+      background-color: #ffffff;
+      color: #333;
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+    }
+
+    header {
+      background-color: #f7f7f7;
+      text-align: center;
+      padding: 2rem 1rem;
+      border-bottom: 1px solid #ddd;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2rem;
+      color: #222;
+    }
+
+    main {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    section {
+      margin-bottom: 4rem;
+    }
+
+    h2 {
+      color: #444;
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      max-width: 850px;
+      font-size: 1rem;
+    }
+
+    .chart {
+      margin-top: 1rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      padding: 0.5rem;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.9rem;
+      padding: 1rem;
+      color: #666;
+      border-top: 1px solid #eee;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Global Inflation: A Visual Story (1980–2024)</h1>
+    <p>Exploring how inflation rates have shifted across the world and within individual countries.</p>
+  </header>
+
+  <main>
+    <!-- SECTION 1: Choropleth Map -->
+    <section>
+      <h2>🌍 Global Overview of Inflation</h2>
+      <p>
+        The map below shows the global inflation rate across all countries from 1980 to 2024. 
+        Use the slider to explore how inflation levels have changed through the decades. 
+        Countries with darker shades of orange indicate higher inflation rates, while grey areas have missing or unavailable data.
+      </p>
+
+      <div id="map" class="chart"></div>
+    </section>
+
+    <!-- SECTION 2: Line Chart -->
+    <section>
+      <h2>📈 Country-Specific Inflation Trends</h2>
+      <p>
+        To take a closer look at individual countries, select one from the dropdown menu below. 
+        The line chart traces the country’s inflation rate year by year, showing long-term trends and volatility.
+      </p>
+
+      <div id="linechart" class="chart"></div>
+    </section>
+
+    <section>
+      <h2>💬 Insights</h2>
+      <p>
+        From the map, we can observe that certain regions—particularly emerging economies—experienced 
+        higher inflation spikes during the late 20th century. Meanwhile, developed economies such as 
+        the United States, Germany, and Japan have maintained relatively stable inflation trends over time. 
+        Use the interactive tools to discover how specific countries’ inflation trajectories compare to the global context.
+      </p>
+    </section>
+  </main>
+
+  <footer>
+    <p>Data visualization created with Vega-Lite | Dataset: Global Inflation (1980–2024)</p>
+  </footer>
+
+  <!-- Embed Vega-Lite visualizations -->
+  <script type="text/javascript">
+    const mapSpec = {
+      "$schema": "https://vega.github.io/schema/vega-lite/v6.json",
+      "width": 800,
+      "height": 400,
+      "data": {
+        "url": "https://raw.githubusercontent.com/FIT3179/Vega-Lite/main/3_choropleth_map/js/ne_110m_admin_0_countries.topojson",
+        "format": {"type": "topojson", "feature": "ne_110m_admin_0_countries"}
+      },
+      "projection": {"type": "equalEarth"},
+      "params": [
+        {
+          "name": "YearSelect",
+          "value": 2024,
+          "bind": {
+            "input": "range",
+            "min": 1980,
+            "max": 2024,
+            "step": 1,
+            "name": "Year: "
+          }
+        }
+      ],
+      "layer": [
+        {
+          "transform": [{"calculate": "'Data is not available in ' + datum.properties.NAME", "as": "note"}],
+          "mark": {"type": "geoshape", "fill": "lightgray", "stroke": "white"},
+          "encoding": {"tooltip": {"field": "note"}}
+        },
+        {
+          "data": {
+            "url": "https://raw.githubusercontent.com/FIT3179/Vega-Lite/main/7_others/oceans.topojson",
+            "format": {"type": "topojson", "feature": "oceans"}
+          },
+          "mark": {"type": "geoshape", "fill": "lightskyblue"}
+        },
+        {
+          "data": {
+            "url": "https://raw.githubusercontent.com/FIT3179/Vega-Lite/main/2_symbol_map/js/WorldMapWithGraticules.topojson",
+            "format": {"type": "topojson", "feature": "ne_110m_graticules_30"}
+          },
+          "mark": {"type": "geoshape", "fill": null, "stroke": "#d0d0d0", "strokeWidth": 0.6}
+        },
+        {
+          "data": {
+            "url": "https://raw.githubusercontent.com/FIT3179/Vega-Lite/main/3_choropleth_map/js/ne_110m_admin_0_countries.topojson",
+            "format": {"type": "topojson", "feature": "ne_110m_admin_0_countries"}
+          },
+          "transform": [
+            {"calculate": "upper(datum.properties.ISO_A3)", "as": "iso3"},
+            {"filter": "datum.iso3 != '' && datum.iso3 != '---' && datum.iso3 != '-99'"},
+            {"calculate": "datum.iso3 + '_' + YearSelect", "as": "ISO3_year"},
+            {
+              "lookup": "ISO3_year",
+              "from": {
+                "data": {
+                  "url": "https://raw.githubusercontent.com/ttjo0003/FIT3179_w10_hw/refs/heads/main/global_inflation_long_new_keyed.csv"
+                },
+                "key": "ISO3_year",
+                "fields": ["inflation", "country_name"]
+              },
+              "as": ["inflation_raw", "country_name_raw"],
+              "default": {}
+            },
+            {"calculate": "toNumber(datum.inflation_raw)", "as": "inflation"},
+            {"calculate": "datum.country_name_raw", "as": "country_name"},
+            {"calculate": "YearSelect", "as": "year"}
+          ],
+          "mark": {"type": "geoshape", "stroke": "#bbbbbb", "strokeWidth": 0.3},
+          "encoding": {
+            "color": {
+              "condition": {
+                "test": "isValid(datum.inflation)",
+                "field": "inflation",
+                "type": "quantitative",
+                "title": "Inflation Rate (%)",
+                "scale": {"scheme": "yelloworangered", "domain": [0, 10], "clamp": true}
+              },
+              "value": "#464646"
+            },
+            "tooltip": [
+              {"field": "properties.NAME", "title": "Country"},
+              {"field": "inflation", "title": "Inflation (%)"},
+              {"field": "year", "title": "Year"}
+            ]
+          }
+        }
+      ]
+    };
+
+    const lineSpec = {
+      "$schema": "https://vega.github.io/schema/vega-lite/v6.json",
+      "width": 700,
+      "height": 400,
+      "background": "#f9f9f9",
+      "data": {
+        "url": "https://raw.githubusercontent.com/ttjo0003/FIT3179_w9_hw/refs/heads/main/global_inflation_long_new.csv"
+      },
+      "params": [
+        {
+          "name": "CountrySelect",
+          "value": "Malaysia",
+          "bind": {
+            "input": "select",
+            "options": ["Malaysia", "Singapore", "Indonesia", "Thailand", "United States", "China", "Japan", "India", "United Kingdom", "Germany"],
+            "name": "Select Country: "
+          }
+        }
+      ],
+      "transform": [{"filter": "datum.country_name == CountrySelect"}],
+      "mark": {"type": "line", "point": true, "strokeWidth": 2, "color": "#e34a33"},
+      "encoding": {
+        "x": {"field": "year", "type": "temporal", "title": "Year", "axis": {"format": "%Y", "labelAngle": 0}},
+        "y": {"field": "inflation", "type": "quantitative", "title": "Inflation Rate (%)"},
+        "tooltip": [{"field": "year", "title": "Year"}, {"field": "inflation", "title": "Inflation (%)"}]
+      },
+      "title": {"text": "Inflation Rate Over Time", "fontSize": 18, "anchor": "start", "color": "#333"}
+    };
+
+    vegaEmbed("#map", mapSpec, {actions: false});
+    vegaEmbed("#linechart", lineSpec, {actions: false});
+  </script>
+</body>
+</html>

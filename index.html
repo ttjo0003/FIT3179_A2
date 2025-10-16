@@ -10,33 +10,56 @@
   <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
 
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Merriweather:wght@700&display=swap" rel="stylesheet">
+
   <style>
+    :root {
+      --accent-color: #1565c0;
+      --bg-gradient: linear-gradient(120deg, #f8fafc, #eef2f7);
+      --header-gradient: linear-gradient(90deg, #1e3c72, #2a5298);
+    }
+
     body {
       font-family: "Inter", "Segoe UI", sans-serif;
-      background-color: #ffffff;
+      background: var(--bg-gradient);
       color: #333;
       margin: 0;
       padding: 0;
       line-height: 1.6;
+      overflow-x: hidden;
     }
 
     header {
-      background-color: #f7f7f7;
+      background: var(--header-gradient);
+      color: #fff;
       text-align: center;
-      padding: 2rem 1rem;
-      border-bottom: 1px solid #ddd;
+      padding: 3rem 1.5rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
 
     header h1 {
+      font-family: "Merriweather", Georgia, serif;
       margin: 0;
-      font-size: 2rem;
-      color: #222;
+      font-size: 2.4rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    header p {
+      font-family: "Inter", "Segoe UI", sans-serif;
+      margin: 0.8rem auto 0;
+      max-width: 700px;
+      font-size: 1.1rem;
+      color: rgba(255, 255, 255, 0.9);
     }
 
     main {
-      max-width: 1000px;
+      max-width: 1100px;
       margin: 0 auto;
-      padding: 2rem;
+      padding: 3rem 1.5rem;
+      animation: fadeIn 1s ease-in-out;
     }
 
     section {
@@ -44,30 +67,90 @@
     }
 
     h2 {
-      color: #444;
+      color: #222;
+      font-weight: 600;
       margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    h2::after {
+      content: "";
+      display: block;
+      width: 50px;
+      height: 3px;
+      background-color: var(--accent-color);
+      border-radius: 2px;
+      margin-top: 6px;
     }
 
     p {
       max-width: 850px;
       font-size: 1rem;
+      color: #555;
     }
 
     .chart {
-      margin-top: 1rem;
-      border: 1px solid #ddd;
-      border-radius: 8px;
+      margin-top: 1.5rem;
       background: #fff;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-      padding: 0.5rem;
+      border-radius: 12px;
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+      padding: 1rem;
+      transform: translateY(10px);
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards;
     }
 
     footer {
+      width: 100%;
       text-align: center;
-      font-size: 0.9rem;
-      padding: 1rem;
+      font-size: 0.95rem;
+      padding: 1.5rem;
       color: #666;
-      border-top: 1px solid #eee;
+      border-top: 1px solid #e2e2e2;
+      background-color: #fafafa;
+    }
+
+    footer p {
+      max-width: none;      /* remove inherited 850px limit */
+      margin: 0 auto;       /* center horizontally */
+      text-align: center;   /* align text in the middle */
+      line-height: 1.6;
+    }
+
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Slider styling */
+    input[type="range"] {
+      accent-color: var(--accent-color);
+      cursor: pointer;
+      margin-left: 10px;
+    }
+
+    select {
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 1rem;
+      margin-left: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    select:hover {
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 3px rgba(227, 74, 51, 0.2);
     }
   </style>
 </head>
@@ -81,22 +164,32 @@
   <main>
     <!-- SECTION 1: Choropleth Map -->
     <section>
-      <h2>🌍 Global Overview of Inflation</h2>
+      <h2>Global Overview of Inflation</h2>
       <p>
         The map below shows the global inflation rate across all countries from 1980 to 2024. 
-        Use the slider to explore how inflation levels have changed through the decades. 
-        Countries with darker shades of orange indicate higher inflation rates, while grey areas have missing or unavailable data.
+        Use the slider to select a year and see how inflation rates have changed worldwide.
+        The darker the shade of orange, the higher the inflation rate in that country for the selected year.
       </p>
 
       <div id="map" class="chart"></div>
     </section>
 
-    <!-- SECTION 2: Line Chart -->
+    <!-- SECTION 2: Top 10 Inflation Countries -->
     <section>
-      <h2>📈 Country-Specific Inflation Trends</h2>
+      <h2>Top 10 Countries with the Highest Inflation</h2>
       <p>
-        To take a closer look at individual countries, select one from the dropdown menu below. 
-        The line chart traces the country’s inflation rate year by year, showing long-term trends and volatility.
+        This bar chart ranks the top 10 countries with the highest inflation rate for the selected year.
+        Use the same year slider as in the map above to explore how rankings have changed over time.
+      </p>
+
+      <div id="top10chart" class="chart"></div>
+    </section>
+
+    <!-- SECTION 3: Line Chart -->
+    <section>
+      <h2>Country-Specific Inflation Trends</h2>
+      <p>
+        Select a country from the dropdown menu below to see how its inflation trend year by year.
       </p>
 
       <div id="linechart" class="chart"></div>
@@ -105,19 +198,22 @@
     <section>
       <h2>💬 Insights</h2>
       <p>
-        From the map, we can observe that certain regions—particularly emerging economies—experienced 
+        From the map, we observe that certain regions—particularly emerging economies—experienced 
         higher inflation spikes during the late 20th century. Meanwhile, developed economies such as 
-        the United States, Germany, and Japan have maintained relatively stable inflation trends over time. 
-        Use the interactive tools to discover how specific countries’ inflation trajectories compare to the global context.
+        the United States, Germany, and Japan have maintained relatively stable inflation over time.
       </p>
     </section>
   </main>
 
   <footer>
-    <p>Data visualization created with Vega-Lite | Dataset: Global Inflation (1980–2024)</p>
-  </footer>
+    <p>
+      <strong>Global Inflation Dashboard</strong> · Created with <a href="https://vega.github.io/vega-lite/" target="_blank">Vega-Lite</a><br>
+      2025 Tommy Tjoa · Updated 16 Oct 2025 · Data: <a href="https://www.kaggle.com/datasets/sazidthe1/global-inflation-data" target="_blank">Global Inflation (1980–2024)</a><br>
+    </p>
+</footer>
 
-  <!-- Embed Vega-Lite visualizations -->
+
+  <!-- Vega-Lite Visualizations -->
   <script type="text/javascript">
     const mapSpec = {
       "$schema": "https://vega.github.io/schema/vega-lite/v6.json",
@@ -212,7 +308,7 @@
       "$schema": "https://vega.github.io/schema/vega-lite/v6.json",
       "width": 700,
       "height": 400,
-      "background": "#f9f9f9",
+      "background": "#ffffff",
       "data": {
         "url": "https://raw.githubusercontent.com/ttjo0003/FIT3179_w9_hw/refs/heads/main/global_inflation_long_new.csv"
       },
@@ -228,7 +324,7 @@
         }
       ],
       "transform": [{"filter": "datum.country_name == CountrySelect"}],
-      "mark": {"type": "line", "point": true, "strokeWidth": 2, "color": "#e34a33"},
+      "mark": {"type": "line", "point": true, "strokeWidth": 3, "color": "#e34a33"},
       "encoding": {
         "x": {"field": "year", "type": "temporal", "title": "Year", "axis": {"format": "%Y", "labelAngle": 0}},
         "y": {"field": "inflation", "type": "quantitative", "title": "Inflation Rate (%)"},
@@ -237,6 +333,68 @@
       "title": {"text": "Inflation Rate Over Time", "fontSize": 18, "anchor": "start", "color": "#333"}
     };
 
+        const top10Spec = {
+      "$schema": "https://vega.github.io/schema/vega-lite/v6.json",
+      "width": 700,
+      "height": 400,
+      "data": {
+        "url": "https://raw.githubusercontent.com/ttjo0003/FIT3179_w10_hw/refs/heads/main/global_inflation_long_new_keyed.csv"
+      },
+      "params": [
+        {
+          "name": "YearSelect",
+          "value": 2024,
+          "bind": {
+            "input": "range",
+            "min": 1980,
+            "max": 2024,
+            "step": 1,
+            "name": "Year: "
+          }
+        }
+      ],
+      "transform": [
+        {"filter": "datum.year == YearSelect"},
+        {"filter": "isValid(datum.inflation)"},
+        {
+          "window": [{"op": "rank", "as": "rank"}],
+          "sort": [{"field": "inflation", "order": "descending"}]
+        },
+        {"filter": "datum.rank <= 10"}
+      ],
+      "mark": {"type": "bar", "cornerRadiusEnd": 4, "tooltip": true},
+      "encoding": {
+        "y": {
+          "field": "country_name",
+          "type": "nominal",
+          "sort": "-x",
+          "title": "Country"
+        },
+        "x": {
+          "field": "inflation",
+          "type": "quantitative",
+          "title": "Inflation Rate (%)"
+        },
+        "color": {
+          "field": "inflation",
+          "type": "quantitative",
+          "scale": {"scheme": "orangered"}
+        },
+        "tooltip": [
+          {"field": "country_name", "title": "Country"},
+          {"field": "inflation", "title": "Inflation (%)"},
+          {"field": "year", "title": "Year"}
+        ]
+      },
+      "title": {
+        "text": "Top 10 Countries with Highest Inflation",
+        "fontSize": 18,
+        "anchor": "start",
+        "color": "#333"
+      }
+    };
+
+    vegaEmbed("#top10chart", top10Spec, {actions: false});
     vegaEmbed("#map", mapSpec, {actions: false});
     vegaEmbed("#linechart", lineSpec, {actions: false});
   </script>

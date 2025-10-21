@@ -1,16 +1,14 @@
-<!DOCTYPE html><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Global Inflation Trends</title>
 
-    <!-- Vega & Vega-Lite -->
     <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
 
-    <!-- Google Fonts -->
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap"
       rel="stylesheet"
@@ -134,13 +132,12 @@
       }
 
       footer p {
-        max-width: none; /* remove inherited 850px limit */
-        margin: 0 auto; /* center horizontally */
-        text-align: center; /* align text in the middle */
+        max-width: none;
+        margin: 0 auto;
+        text-align: center;
         line-height: 1.6;
       }
 
-      /* Animations */
       @keyframes fadeIn {
         from {
           opacity: 0;
@@ -210,7 +207,6 @@
     </header>
 
     <main>
-      <!-- SECTION 1: Choropleth Map -->
       <section>
         <h2>Global Overview of Inflation</h2>
         <p>
@@ -221,7 +217,6 @@
         <div id="map" class="chart"></div>
       </section>
 
-      <!-- SECTION 2: Top 10 Inflation Countries -->
       <section>
         <h2>Top 10 Countries with the Highest Inflation</h2>
         <p>
@@ -231,7 +226,6 @@
         <div id="top10chart" class="chart"></div>
       </section>
 
-      <!-- SECTION 3: Line Chart -->
       <section>
         <h2>Country-Specific Inflation Trends</h2>
         <p>
@@ -242,7 +236,6 @@
         <div id="linechart" class="chart"></div>
       </section>
 
-      <!-- SECTION 4: Heatmap -->
       <section>
         <h2>Inflation Heatmap Across Countries and Years</h2>
         <p>
@@ -265,7 +258,7 @@
         <strong>Global Inflation Dashboard</strong> · Created with
         <a href="https://vega.github.io/vega-lite/" target="_blank">Vega-Lite</a
         ><br />
-        2025 Tommy Tjoa · Updated 16 Oct 2025 · Data:
+        Tommy Tjoa · Updated 16 Oct 2025 · Data:
         <a
           href="https://www.kaggle.com/datasets/sazidthe1/global-inflation-data"
           target="_blank"
@@ -432,7 +425,6 @@
                 "Indonesia",
                 "Thailand",
                 "United States",
-                "China",
                 "Japan",
                 "India",
                 "United Kingdom",
@@ -479,8 +471,7 @@
         "width": 700,
         "height": 400,
         "data": {
-          "url":
-            "https://raw.githubusercontent.com/ttjo0003/FIT3179_A2/refs/heads/main/global_inflation_long_new_keyed.csv"
+          "url": "https://raw.githubusercontent.com/ttjo0003/FIT3179_A2/refs/heads/main/global_inflation_long_new_keyed.csv"
         },
         "params": [
           {
@@ -504,28 +495,59 @@
           },
           { "filter": "datum.rank <= 10" }
         ],
-        "mark": { "type": "bar", "cornerRadiusEnd": 4, "tooltip": true },
-        "encoding": {
-          "y": {
-            "field": "country_name",
-            "type": "nominal",
-            "sort": "-x",
-            "title": "Country"
+        "layer": [
+
+          {
+            "mark": { "type": "bar", "cornerRadiusEnd": 4 },
+            "encoding": {
+              "y": {
+                "field": "country_name",
+                "type": "nominal",
+                "sort": "-x",
+                "title": "Country"
+              },
+              "x": {
+                "field": "inflation",
+                "type": "quantitative",
+                "title": "Inflation Rate (%)"
+              },
+              "color": { "value": "#e8643c" },
+              "tooltip": [
+                { "field": "country_name", "title": "Country" },
+                { "field": "inflation", "title": "Inflation (%)" },
+                { "field": "year", "title": "Year" }
+              ]
+            }
           },
-          "x": {
-            "field": "inflation",
-            "type": "quantitative",
-            "title": "Inflation Rate (%)"
+          {
+            "mark": {
+              "type": "text",
+              "align": "left",
+              "dx": 5,
+              "fontSize": 12,
+              "color": "#333"
+            },
+            "encoding": {
+              "y": { "field": "country_name", "type": "nominal", "sort": "-x" },
+              "x": { "field": "inflation", "type": "quantitative" },
+              "text": { "field": "inflation", "type": "quantitative", "format": ".1f" }
+            }
           },
-          "color": {
-            "value": "#e8643c"
-          },
-          "tooltip": [
-            { "field": "country_name", "title": "Country" },
-            { "field": "inflation", "title": "Inflation (%)" },
-            { "field": "year", "title": "Year" }
-          ]
-        },
+          {
+            "transform": [
+              { "filter": "datum.inflation > 50" }
+            ],
+            "mark": {
+              "type": "text",
+              "align": "left",
+              "dx": 10,
+              "dy": -10,
+              "fontSize": 14,
+              "fontWeight": "bold",
+              "color": "#b71c1c"
+            }
+          }
+        ],
         "config": {
           "view": { "stroke": "transparent" },
           "axis": { "grid": true, "gridColor": "#f0f0f0" },
@@ -608,9 +630,7 @@
         }
       };
 
-      // Add this line to render the heatmap:
       vegaEmbed("#heatmap", heatmapSpec, { actions: false });
-
       vegaEmbed("#top10chart", top10Spec, { actions: false });
       vegaEmbed("#map", mapSpec, { actions: false });
       vegaEmbed("#linechart", lineSpec, { actions: false });
